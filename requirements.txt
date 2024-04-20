@@ -1,0 +1,11 @@
+fastapi==0.89.1
+
+#ASGI server
+uvicorn==0.17.6
+
+#for database
+sqlalchemy==1.4.46
+psycopg2-binary
+
+#data validation
+pydantic
