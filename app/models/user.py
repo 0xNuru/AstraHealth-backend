@@ -1,14 +1,14 @@
 #!/usr/bin/python3
 """this module defines the user model"""
 
-#standard library import
+# standard library import
 import enum
 
-#Third-party imports
+# Third-party imports
 from sqlalchemy import Column, String, Enum
 
-#local imports
-from models.base_model import BaseModel, Base
+# local imports
+from app.models.base_model import BaseModel, Base
 
 
 class GenderEnum(enum.Enum):
@@ -18,6 +18,7 @@ class GenderEnum(enum.Enum):
 
 class Users(BaseModel, Base):
     """user table"""
+
     __tablename__ = "user"
     first_name: str = Column(String(128), nullable=False)
     last_name: str = Column(String(128), nullable=False)

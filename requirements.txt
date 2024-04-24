@@ -9,6 +9,7 @@ psycopg2-binary
 
 #data validation
 pydantic
+pydantic[email]
 
 #env
 python-dotenv

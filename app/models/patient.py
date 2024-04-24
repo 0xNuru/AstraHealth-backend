@@ -4,11 +4,11 @@ import enum
 
 from sqlalchemy import Column, ForeignKey, Enum, String
 
-from models.user import Users
+from app.models.user import Users
 
 
 class Patient(Users):
     """patient table"""
+
     __tablename__ = "patients"
-    id = Column(String, ForeignKey(
-    'user.id',  ondelete="CASCADE"), primary_key=True)
+    id = Column(String, ForeignKey("user.id", ondelete="CASCADE"), primary_key=True)

@@ -13,7 +13,9 @@ from pydantic import BaseModel, EmailStr, SecretStr, constr, root_validator
 from app.models.user import GenderEnum
 
 
-password_regex = "(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!#%*?&]{8,20}"
+password_regex = (
+    "(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!#%*?&]{8,20}"
+)
 
 
 class Patient(BaseModel):
@@ -24,10 +26,10 @@ class Patient(BaseModel):
     password2: SecretStr
     gender: GenderEnum
     dob: date
-    phone: constr(min_length=11, max_length=14) # type: ignore
-    address: constr(min_length=10) # type: ignore
+    phone: constr(min_length=11, max_length=14)  # type: ignore
+    address: constr(min_length=10)  # type: ignore
 
-    class Config():
+    class Config:
         orm_mode = True
 
     @root_validator()
@@ -38,7 +40,8 @@ class Patient(BaseModel):
             raise ValueError("The two passwords did not match.")
         if not re.match(password_regex, confirm_password):
             raise ValueError(
-                "Password length must be atleast 8 and contains alphabets, number with a spectial character")
+                "Password length must be atleast 8 and contains alphabets, number with a spectial character"
+            )
         return values
 
 
@@ -46,5 +49,5 @@ class ShowPatient(BaseModel):
     name: str
     email: str
 
-    class Config():
+    class Config:
         orm_mode = True
