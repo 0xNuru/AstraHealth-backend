@@ -34,8 +34,6 @@ def db_credentials_are_set():
 
 if not db_credentials_are_set():
     """checks if DB credentials are set in the .env file"""
-else:
-    print("Database credentials are ready.")
 
 
 class DBStorage:
@@ -60,7 +58,7 @@ class DBStorage:
             self.engine = create_engine(DB_URL, pool_pre_ping=True)
             # Attempt to connect to the database to verify that the engine is working.
             with self.engine.connect() as conn:
-                print("PostgreSQL connected successfully!")
+                pass
         except exc.SQLAlchemyError as e:
             print(f"Failed to connect to the database: {e}")
             # manage the error appropriately

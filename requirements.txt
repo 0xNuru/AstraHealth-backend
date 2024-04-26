@@ -16,4 +16,6 @@ python-dotenv
 
 #auth
 passlib[bcrypt] 
+fastapi-jwt-auth
+
 
