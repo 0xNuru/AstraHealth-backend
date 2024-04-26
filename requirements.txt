@@ -13,3 +13,7 @@ pydantic[email]
 
 #env
 python-dotenv
+
+#auth
+passlib[bcrypt] 
+

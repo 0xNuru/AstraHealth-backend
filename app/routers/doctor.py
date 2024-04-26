@@ -1,7 +1,7 @@
 #!/usr/bin/python3
-"""This module contians the patient-related endpoints"""
+"""This module contians the doctor-related endpoints"""
 from app.engine.load import load
-from app.models.patient import Patient
+from app.models.doctor import Doctor
 from app.models.user import User
 from app.schema.user import ShowUser, CreateUser
 from app.utils import auth
@@ -9,7 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
 
-router = APIRouter(prefix="/v1/patient", tags=["patient management"])
+router = APIRouter(prefix="/v1/doctor", tags=["doctor management"])
 
 
 @router.get("/")
@@ -36,7 +36,7 @@ def register(request: CreateUser, db: Session = Depends(load)):
             detail=[{"msg": f"user with email: {email} exists"}],
         )
     password_hash = auth.get_password_hash(request.password1.get_secret_value())
-    new_patient = Patient(
+    new_doctor = Doctor(
         first_name=request.first_name,
         last_name=request.last_name,
         gender=request.gender,
@@ -45,13 +45,13 @@ def register(request: CreateUser, db: Session = Depends(load)):
         phone=request.phone,
         email=request.email,
         password_hash=password_hash,
-        role="patient",
+        role="doctor",
     )
-    db.add(new_patient)
-    return new_patient
+    db.add(new_doctor)
+    return new_doctor
 
 
 @router.get("/all", response_model=List[ShowUser], status_code=status.HTTP_200_OK)
 def all(db: Session = Depends(load)):
-    patients = db.query_eng(Patient).all()
-    return patients
+    doctors = db.query_eng(Doctor).all()
+    return doctors

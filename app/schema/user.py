@@ -1,11 +1,10 @@
 #!/usr/bin/python3
 """
 this module defines the schema for making requests 
-and returning responsesto the endpoints
+and returning responses to the user endpoints
 """
 
 import re
-
 
 from datetime import date
 from pydantic import BaseModel, EmailStr, SecretStr, constr, root_validator
@@ -18,7 +17,7 @@ password_regex = (
 )
 
 
-class Patient(BaseModel):
+class CreateUser(BaseModel):
     first_name: str
     last_name: str
     email: EmailStr
@@ -34,19 +33,29 @@ class Patient(BaseModel):
 
     @root_validator()
     def verify_password_match(cls, values):
-        password = values.get("password1").get_secret_value()
-        confirm_password = values.get("password2").get_secret_value()
+        password1 = values.get("password1")
+        password2 = values.get("password2")
+
+        if password1 is None or password2 is None:
+            raise ValueError("Both password fields must be provided.")
+
+        password = password1.get_secret_value()
+        confirm_password = password2.get_secret_value()
+
         if password != confirm_password:
             raise ValueError("The two passwords did not match.")
+
         if not re.match(password_regex, confirm_password):
             raise ValueError(
-                "Password length must be atleast 8 and contains alphabets, number with a spectial character"
+                "Password must be at least 8 characters and include alphabets, numbers, and a special character."
             )
+
         return values
 
 
-class ShowPatient(BaseModel):
-    name: str
+class ShowUser(BaseModel):
+    first_name: str
+    last_name: str
     email: str
 
     class Config:

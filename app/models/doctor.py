@@ -1,13 +1,13 @@
 #!/usr/bin/python3
-"""this module defines the patient model"""
+"""this module defines the doctors model"""
 
 from sqlalchemy import Column, ForeignKey, String
 
 from app.models.user import User
 
 
-class Patient(User):
-    """patient table"""
+class Doctor(User):
+    """doctor table"""
 
-    __tablename__ = "patients"
+    __tablename__ = "doctors"
     id = Column(String, ForeignKey("user.id", ondelete="CASCADE"), primary_key=True)

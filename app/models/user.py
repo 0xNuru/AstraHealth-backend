@@ -5,7 +5,7 @@
 import enum
 
 # Third-party imports
-from sqlalchemy import Column, String, Enum
+from sqlalchemy import Column, String, Enum, Date
 
 # local imports
 from app.models.base_model import BaseModel, Base
@@ -16,7 +16,7 @@ class GenderEnum(enum.Enum):
     F = "Female"
 
 
-class Users(BaseModel, Base):
+class User(BaseModel, Base):
     """user table"""
 
     __tablename__ = "user"
@@ -27,4 +27,5 @@ class Users(BaseModel, Base):
     phone: str = Column(String(60), unique=True, nullable=False)
     email = Column(String(128), unique=True, nullable=False)
     password_hash = Column(String(128), nullable=False)
-    role = Column(String(50), nullable=True)
+    role = Column(String(50), nullable=False)
+    dob = Column(Date, nullable=False)
