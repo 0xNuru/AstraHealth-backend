@@ -17,5 +17,7 @@ python-dotenv
 #auth
 passlib[bcrypt] 
 fastapi-jwt-auth
+python-multipart
+python-jose[cryptography]
 
 

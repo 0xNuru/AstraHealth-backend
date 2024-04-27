@@ -19,7 +19,7 @@ class Settings(BaseSettings):
         contains all required settings
     """
 
-    proj_name: str = ""
+    project_name: str = "AstraHealth"
 
     #  database settings
     DB_USER: str
@@ -27,13 +27,6 @@ class Settings(BaseSettings):
     DB_NAME: str
     DB_HOST: str
     DB_PORT: str
-
-    # jwt settings
-    jwt_secret_key: str
-    jwt_algorithm: str
-    token_life_span: int
-    token_long_life_span: int
-    tokenUrl: str
 
     class Config:
         env_file = "../.env"
