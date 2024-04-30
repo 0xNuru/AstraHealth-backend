@@ -53,5 +53,6 @@ def register(request: CreateUser, db: Session = Depends(load)):
 
 @router.get("/all", response_model=List[ShowUser], status_code=status.HTTP_200_OK)
 def all(db: Session = Depends(load)):
+    print(type(db))
     patients = db.query_eng(Patient).all()
     return patients
