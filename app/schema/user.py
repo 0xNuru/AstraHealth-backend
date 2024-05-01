@@ -23,10 +23,10 @@ class CreateUser(BaseModel):
     email: EmailStr
     password1: SecretStr
     password2: SecretStr
-    gender: GenderEnum
-    dob: date
+    # gender: GenderEnum
+    # dob: date
     phone: constr(min_length=11, max_length=14)  # type: ignore
-    address: constr(min_length=10)  # type: ignore
+    # address: constr(min_length=10)  # type: ignore
 
     class Config:
         orm_mode = True
