@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
+from .cookie import OAuth2PasswordBearerWithCookie
 from app.config.config import settings
 from app.engine.load import load
 from app.models.user import User
 from datetime import datetime, timedelta, timezone
 from fastapi import Depends, HTTPException, Request, Response, status
-from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt  # type: ignore
 from sqlalchemy.orm import Session
 
@@ -14,7 +14,7 @@ from passlib.context import CryptContext  # type: ignore
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/v1/auth/token")
+oauth2_scheme = OAuth2PasswordBearerWithCookie(tokenUrl="/v1/auth/token")
 
 
 def get_password_hash(password: str) -> str:
