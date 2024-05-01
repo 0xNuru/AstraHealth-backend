@@ -5,7 +5,7 @@ from app.routers import doctor
 from app.routers import auth
 
 app = FastAPI()
-origins = ["http://localhost:5500"]
+origins = ["*"]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
