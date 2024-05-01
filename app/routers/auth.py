@@ -1,60 +1,46 @@
-#!/usr/bin/python3
+#!/usr/bin/env python
 
-from app.models.user import User
-from app.schema.auth import UserLogin, LoginResponse
-from app.utils import auth
+from datetime import timedelta
 from app.engine.load import load
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from app.config.config import settings
+from app.schema.auth import Token
+from app.schema.user import ShowUser
+from app.utils.auth import (
+    authenticate_user,
+    create_access_token,
+    get_current_user,
+    get_current_user_from_cookie,
+    set_access_cookies,
+)
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from app.utils.auth import AuthJWT
 
 
 router = APIRouter(prefix="/v1/auth", tags=["Authentication"])
 
 
-@router.post("/login", status_code=status.HTTP_200_OK)
-async def login(
+@router.post("/token")
+def login(
     response: Response,
-    request: UserLogin = Depends(),
-    Authorize: AuthJWT = Depends(),
+    form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(load),
-):
-
-    email = request.email.lower()
-    password = request.password.get_secret_value()
-
-    user = db.query_eng(User).filter(User.email == email).first()
-
+) -> Token:
+    user = authenticate_user(form_data.username, form_data.password, db)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=[{"msg": f"Incorrect Username or Password"}],
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
         )
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user.email}, expires_delta=access_token_expires
+    )
+    set_access_cookies(access_token, response)
+    return Token(access_token=access_token, token_type="bearer")
 
-    if not auth.verify_password(password, user.password_hash):
 
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=[{"msg": f"Incorrect Username or Password"}],
-        )
-
-    data = {
-        "username": user.first_name,
-        "email": user.email,
-        "user_id": user.id,
-        "role": user.role,
-    }
-
-    # generate user cookies
-    access_token = auth.access_token(data)
-    refresh_token = auth.refresh_token(data)
-
-    # # save tokens in the cookies
-    auth.set_access_cookies(access_token, response)
-    auth.set_refresh_cookies(refresh_token, response)
-
-    return {
-        "status": "success",
-        "message": "user logged in successfully",
-        "tokens": {"access_token": access_token, "refresh_token": refresh_token},
-    }
+@router.get("/me/", response_model=ShowUser)
+def me(current_user: ShowUser = Depends(get_current_user)):
+    return current_user

@@ -1,51 +1,20 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-import datetime
+from .cookie import OAuth2PasswordBearerWithCookie
 from app.config.config import settings
-from fastapi import Response
-from fastapi_jwt_auth import AuthJWT
+from app.engine.load import load
+from app.models.user import User
+from datetime import datetime, timedelta, timezone
+from fastapi import Depends, HTTPException, Request, Response, status
+from jose import JWTError, jwt  # type: ignore
+from sqlalchemy.orm import Session
+
 from passlib.context import CryptContext  # type: ignore
-from pydantic import BaseModel
-from typing import List
-
-
-ACCESS_TOKEN_EXPIRES_IN = settings.token_life_span * 60
-REFRESH_TOKEN_EXPIRES_IN = settings.token_long_life_span * 60
-
-
-class Settings(BaseModel):
-    """
-    Desc:
-        initializes authjwt params
-    Returns:
-        None
-    """
-
-    authjwt_algorithm: str = settings.jwt_algorithm
-    authjwt_decode_algorithms: List[str] = [settings.jwt_algorithm]
-
-    authjwt_token_location: set = {"cookies", "headers"}
-
-    authjwt_access_cookie_key: str = "access_token"
-
-    authjwt_refresh_cookie_key: str = "refresh_token"
-    authjwt_cookie_csrf_protect: bool = False
-
-    authjwt_secret_key: str = settings.jwt_secret_key
-
-
-@AuthJWT.load_config
-def get_config():
-    """
-    Desc:
-        returns an instance of the
-        decorated class settings
-    """
-    return Settings()
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-auth = AuthJWT()
+
+oauth2_scheme = OAuth2PasswordBearerWithCookie(tokenUrl="/v1/auth/token")
 
 
 def get_password_hash(password: str) -> str:
@@ -58,30 +27,56 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     return verified
 
 
-def access_token(data) -> str:
+def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode = data.copy()
-    expire = datetime.timedelta(minutes=ACCESS_TOKEN_EXPIRES_IN)
-    access_token: str = auth.create_access_token(
-        subject=to_encode["email"], expires_time=expire, user_claims=to_encode
+    if expires_delta:
+        expire = datetime.now(timezone.utc) + expires_delta
+    else:
+        expire = datetime.now(timezone.utc) + timedelta(minutes=15)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(
+        to_encode, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM
     )
-    return access_token
+    return encoded_jwt
 
 
-def refresh_token(data) -> str:
-    to_encode = data.copy()
-    expire = datetime.timedelta(minutes=REFRESH_TOKEN_EXPIRES_IN)
-    refresh_token: str = auth.create_refresh_token(
-        subject=to_encode["email"], expires_time=expire, user_claims=to_encode
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(load)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
     )
-    return refresh_token
+    try:
+        payload = jwt.decode(
+            token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
+        )
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
+    user = db.query_eng(User).filter(User.email == username).first()
+    if user is None:
+        raise credentials_exception
+    return user
+
+
+def authenticate_user(username: str, password: str, db: Session = Depends(load)):
+    user = db.query_eng(User).filter(User.email == username).first()
+    if not user:
+        return False
+    if not verify_password(password, user.password_hash):
+        return False
+    return user
 
 
 def set_access_cookies(token: str, response: Response):
     response.set_cookie(
         key="access_token",
-        value=token,
-        max_age=datetime.timedelta(minutes=ACCESS_TOKEN_EXPIRES_IN),
-        expires=datetime.timedelta(minutes=ACCESS_TOKEN_EXPIRES_IN),
+        value=f"Bearer {token}",
+        max_age=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
+        expires=datetime.now(timezone.utc)
+        + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
         path="/",
         domain=None,
         secure=False,
@@ -90,15 +85,24 @@ def set_access_cookies(token: str, response: Response):
     )
 
 
-def set_refresh_cookies(token: str, response: Response):
-    response.set_cookie(
-        key="refresh_token",
-        value=token,
-        max_age=datetime.timedelta(minutes=REFRESH_TOKEN_EXPIRES_IN),
-        expires=datetime.timedelta(minutes=REFRESH_TOKEN_EXPIRES_IN),
-        path="/",
-        domain=None,
-        secure=False,
-        httponly=True,
-        samesite="lax",
+def get_current_user_from_cookie(request: Request, db: Session = Depends(load)) -> User:
+    token = request.cookies.get("access_token")
+    print(token)
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
     )
+    try:
+        payload = jwt.decode(
+            token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
+        )
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
+    user = db.query_eng(User).filter(User.email == username).first()
+    if user is None:
+        raise credentials_exception
+    return user

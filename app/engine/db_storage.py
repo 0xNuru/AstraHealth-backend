@@ -16,24 +16,20 @@ contains:
         - __session
         - dic
 """
-import os
+from app.config.config import settings
 from app.models.base_model import Base
-from dotenv import load_dotenv  # type: ignore
 from sqlalchemy import create_engine, exc
 from sqlalchemy.orm import sessionmaker, scoped_session
-from urllib.parse import quote_plus
-
-
-load_dotenv()
 
 
 def db_credentials_are_set():
     required_keys = ["DB_USER", "DB_PASSWORD", "DB_NAME", "DB_HOST", "DB_PORT"]
-    return all(os.getenv(key) for key in required_keys)
+    return all(getattr(settings, key) for key in required_keys)
 
 
 if not db_credentials_are_set():
     """checks if DB credentials are set in the .env file"""
+    print("DB credentials are not set")
 
 
 class DBStorage:
@@ -47,11 +43,11 @@ class DBStorage:
 
     def __init__(self):
         """Initializes a database engine connection using environment variables"""
-        DB_USER = os.getenv("DB_USER")
-        DB_PASSOWRD = quote_plus(os.getenv("DB_PASSWORD"))
-        DB_HOST = os.getenv("DB_HOST")
-        DB_NAME = os.getenv("DB_NAME")
-        DB_PORT = os.getenv("DB_PORT")
+        DB_USER = settings.DB_USER
+        DB_PASSOWRD = settings.DB_PASSWORD
+        DB_HOST = settings.DB_HOST
+        DB_NAME = settings.DB_NAME
+        DB_PORT = settings.DB_PORT
         DB_URL = f"postgresql+psycopg2://{DB_USER}:{DB_PASSOWRD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
         try:

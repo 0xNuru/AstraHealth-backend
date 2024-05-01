@@ -1,7 +1,7 @@
 fastapi==0.89.1
 
 #ASGI server
-uvicorn==0.17.6
+uvicorn[standard]
 
 #for database
 sqlalchemy==1.4.46
@@ -16,6 +16,8 @@ python-dotenv
 
 #auth
 passlib[bcrypt] 
-fastapi-jwt-auth
+# fastapi-jwt-auth
+python-multipart
+python-jose[cryptography]
 
 
