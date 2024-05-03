@@ -19,7 +19,7 @@ class GenderEnum(enum.Enum):
 class User(BaseModel, Base):
     """user table"""
 
-    __tablename__ = "user"
+    __tablename__ = "users"
     first_name: str = Column(String(128), nullable=False)
     last_name: str = Column(String(128), nullable=False)
     # gender = Column(Enum(GenderEnum, name="gender_enum"))
