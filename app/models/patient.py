@@ -10,4 +10,4 @@ class Patient(User):
     """patient table"""
 
     __tablename__ = "patients"
-    id = Column(String, ForeignKey("user.id", ondelete="CASCADE"), primary_key=True)
+    id = Column(String, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
