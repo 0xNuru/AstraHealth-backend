@@ -81,7 +81,7 @@ def set_access_cookies(token: str, response: Response):
         domain=None,
         secure=True,
         httponly=True,
-        samesite="lax",
+        samesite="none",
     )
 
 
