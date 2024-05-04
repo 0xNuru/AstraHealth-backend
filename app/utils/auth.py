@@ -79,7 +79,7 @@ def set_access_cookies(token: str, response: Response):
         + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
         path="/",
         domain=None,
-        secure=False,
+        secure=True,
         httponly=True,
         samesite="lax",
     )
