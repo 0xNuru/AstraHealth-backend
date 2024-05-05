@@ -38,7 +38,7 @@ def login(
         data={"sub": user.email}, expires_delta=access_token_expires
     )
     set_access_cookies(access_token, response)
-    return Token(access_token=access_token, token_type="bearer")
+    return Token(access_token=access_token, token_type="bearer", role=user.role)
 
 
 @router.get("/me/", response_model=ShowUser)
