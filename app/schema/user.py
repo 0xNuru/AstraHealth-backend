@@ -57,6 +57,7 @@ class ShowUser(BaseModel):
     first_name: str
     last_name: str
     email: str
+    role: str
 
     class Config:
         orm_mode = True
