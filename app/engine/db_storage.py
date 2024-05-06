@@ -6,7 +6,7 @@ contains:
     - instance:
         - all: query objects from db
         - new: add objects to db
-        - save: commit __session
+        - commit: commit __session
         - delete: remove __session from db
         - reload: reload the current __session
         - close: end __session
@@ -177,12 +177,15 @@ class DBStorage:
         Session = scoped_session(sec)
         self.__session = Session()
 
-    def save(self):
+    def commit(self):
         """
         Desc:
             commit changes
         """
         self.__session.commit()
+
+    def refresh(self, obj):
+        self.__session.refresh(obj)
 
     def close(self):
         """

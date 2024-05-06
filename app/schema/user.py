@@ -6,10 +6,7 @@ and returning responses to the user endpoints
 
 import re
 
-from datetime import date
 from pydantic import BaseModel, EmailStr, SecretStr, constr, root_validator
-
-from app.models.user import GenderEnum
 
 
 password_regex = (

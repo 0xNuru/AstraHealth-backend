@@ -6,3 +6,6 @@ class Token(BaseModel):
     access_token: str
     token_type: str
     role: str
+
+    class Config:
+        orm_mode = True

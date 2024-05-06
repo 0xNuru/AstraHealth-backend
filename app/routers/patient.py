@@ -1,8 +1,12 @@
 #!/usr/bin/python3
 """This module contians the patient-related endpoints"""
+import base64
+import binascii
 from app.engine.load import load
 from app.models.patient import Patient
+from app.models.emergency_contact import EmergencyContact
 from app.models.user import User
+from app.schema.patient import UpdatePatientProfile, ShowProfile
 from app.schema.user import ShowUser, CreateUser
 from app.utils import auth
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -48,7 +52,51 @@ def register(request: CreateUser, db: Session = Depends(load)):
     return new_patient
 
 
-@router.get("/all", response_model=List[ShowUser], status_code=status.HTTP_200_OK)
-def all(db: Session = Depends(load)):
-    patients = db.query_eng(Patient).all()
-    return patients
+@router.patch(
+    "/update_profile", response_model=ShowUser, status_code=status.HTTP_200_OK
+)
+def update_profile(
+    request: UpdatePatientProfile,
+    db: Session = Depends(load),
+    user: Patient = Depends(auth.get_current_user),
+):
+    patient = db.query_eng(Patient).filter(Patient.id == user.id).first()
+    for field, value in request.dict(exclude_unset=True).items():
+        if value is not None:
+            if field == "image":
+                # convert base64 image to binary
+                try:
+                    value = base64.b64decode(value)
+                except binascii.Error:
+                    raise HTTPException(
+                        status_code=400, detail="Invalid base64-encoded string"
+                    )
+
+            setattr(patient, field, value)
+    sos_contact = EmergencyContact(
+        full_name=request.SOS_fullname,
+        phone=request.SOS_phone,
+        patient_id=user.id,
+        role="SOS_contact",
+    )
+
+    db.add(patient)
+    db.add(sos_contact)
+    return patient
+
+
+@router.get("/profile", response_model=ShowProfile, status_code=status.HTTP_200_OK)
+def profile(db: Session = Depends(load), user: User = Depends(auth.get_current_user)):
+    patient = db.query_eng(Patient).filter(Patient.id == user.id).first()
+    sos_contact = (
+        db.query_eng(EmergencyContact)
+        .filter(EmergencyContact.patient_id == user.id)
+        .first()
+    )
+
+    return {
+        **user.__dict__,
+        **patient.__dict__,
+        "SOS_fullname": sos_contact.full_name,
+        "SOS_phone": sos_contact.phone,
+    }
