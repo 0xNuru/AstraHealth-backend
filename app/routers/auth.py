@@ -35,7 +35,7 @@ def login(
         )
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.email}, expires_delta=access_token_expires
+        data={"sub": user.email, "role": user.role}, expires_delta=access_token_expires
     )
     set_access_cookies(access_token, response)
     return Token(access_token=access_token, token_type="bearer", role=user.role)
