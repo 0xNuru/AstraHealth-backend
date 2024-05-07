@@ -6,7 +6,7 @@ from app.engine.load import load
 from app.models.patient import Patient
 from app.models.emergency_contact import EmergencyContact
 from app.models.user import User
-from app.schema.patient import UpdatePatientProfile, ShowProfile
+from app.schema.patient import UpdatePatientProfile, ShowPatientProfile
 from app.schema.user import ShowUser, CreateUser
 from app.utils import auth
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -53,7 +53,7 @@ def register(request: CreateUser, db: Session = Depends(load)):
 
 
 @router.patch(
-    "/update_profile", response_model=ShowUser, status_code=status.HTTP_200_OK
+    "/update_profile", response_model=ShowPatientProfile, status_code=status.HTTP_200_OK
 )
 def update_profile(
     request: UpdatePatientProfile,
@@ -69,10 +69,11 @@ def update_profile(
                     value = base64.b64decode(value)
                 except binascii.Error:
                     raise HTTPException(
-                        status_code=400, detail="Invalid base64-encoded string"
+                        status_code=400, detail="Invalid base64-encoded string for image"
                     )
 
             setattr(patient, field, value)
+
     sos_contact = EmergencyContact(
         full_name=request.SOS_fullname,
         phone=request.SOS_phone,
@@ -85,7 +86,9 @@ def update_profile(
     return patient
 
 
-@router.get("/profile", response_model=ShowProfile, status_code=status.HTTP_200_OK)
+@router.get(
+    "/profile", response_model=ShowPatientProfile, status_code=status.HTTP_200_OK
+)
 def profile(db: Session = Depends(load), user: User = Depends(auth.get_current_user)):
     patient = db.query_eng(Patient).filter(Patient.id == user.id).first()
     sos_contact = (
@@ -97,6 +100,6 @@ def profile(db: Session = Depends(load), user: User = Depends(auth.get_current_u
     return {
         **user.__dict__,
         **patient.__dict__,
-        "SOS_fullname": sos_contact.full_name,
-        "SOS_phone": sos_contact.phone,
+        "SOS_fullname": sos_contact.full_name if sos_contact else None,
+        "SOS_phone": sos_contact.phone if sos_contact else None,
     }

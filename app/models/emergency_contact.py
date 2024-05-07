@@ -16,7 +16,7 @@ class EmergencyContact(BaseModel, Base):
 
     __tablename__ = "emergency_contacts"
     full_name: str = Column(String(128), nullable=False)
-    phone: str = Column(String(60), unique=True, nullable=False)
+    phone: str = Column(String(60), unique=False, nullable=False)
     patient_id = Column(String, ForeignKey("patients.id", ondelete="CASCADE"))
 
     patient = relationship(

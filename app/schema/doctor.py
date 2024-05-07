@@ -9,24 +9,25 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from app.models.patient import GenderEnum
+from app.models.doctor import GenderEnum
 
 
-class UpdatePatientProfile(BaseModel):
+class UpdateDoctorProfile(BaseModel):
     dob: Optional[date] = None
     gender: Optional[GenderEnum] = None
     height: Optional[float] = None
     weight: Optional[float] = None
-    medical_history: Optional[str] = None
+    medical_liscence: Optional[str] = None
+    hospital_affiliation: Optional[str] = None
+    resume_link: Optional[str] = None
+    bio: Optional[str] = None
     image: Optional[str] = None
-    SOS_fullname: Optional[str] = None
-    SOS_phone: Optional[str] = None
 
     class Config:
         orm_mode = True
 
 
-class ShowPatientProfile(BaseModel):
+class ShowDoctorProfile(BaseModel):
     first_name: str
     last_name: str
     email: str
@@ -35,10 +36,11 @@ class ShowPatientProfile(BaseModel):
     gender: Optional[GenderEnum] = None
     height: Optional[float] = None
     weight: Optional[float] = None
-    medical_history: Optional[str] = None
+    medical_liscence: Optional[str] = None
+    hospital_affiliation: Optional[str] = None
+    resume_link: Optional[str] = None
+    bio: Optional[str] = None
     image: Optional[str] = None
-    SOS_fullname: Optional[str] = None
-    SOS_phone: Optional[str] = None
 
     class Config:
         orm_mode = True

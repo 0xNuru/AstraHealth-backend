@@ -1,8 +1,12 @@
 #!/usr/bin/python3
 """This module contians the doctor-related endpoints"""
+import base64
+import binascii
 from app.engine.load import load
 from app.models.doctor import Doctor
+from app.models.emergency_contact import EmergencyContact
 from app.models.user import User
+from app.schema.doctor import UpdateDoctorProfile, ShowDoctorProfile
 from app.schema.user import ShowUser, CreateUser
 from app.utils import auth
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -52,3 +56,42 @@ def register(request: CreateUser, db: Session = Depends(load)):
 def all(db: Session = Depends(load)):
     doctors = db.query_eng(Doctor).all()
     return doctors
+
+
+@router.patch(
+    "/update_profile", response_model=ShowDoctorProfile, status_code=status.HTTP_200_OK
+)
+def update_profile(
+    request: UpdateDoctorProfile,
+    db: Session = Depends(load),
+    user: Doctor = Depends(auth.get_current_user),
+):
+    doctor = db.query_eng(Doctor).filter(Doctor.id == user.id).first()
+    for field, value in request.dict(exclude_unset=True).items():
+        if value is not None:
+            if field == "image":
+                # convert base64 image to binary
+                try:
+                    value = base64.b64decode(value)
+                except binascii.Error:
+                    raise HTTPException(
+                        status_code=400,
+                        detail="Invalid base64-encoded string for image",
+                    )
+
+            setattr(doctor, field, value)
+
+    db.add(doctor)
+    return {
+        **user.__dict__,
+        **doctor.__dict__,
+    }
+
+
+@router.get(
+    "/profile", response_model=ShowDoctorProfile, status_code=status.HTTP_200_OK
+)
+def profile(db: Session = Depends(load), user: User = Depends(auth.get_current_user)):
+    doctor = db.query_eng(Doctor).filter(Doctor.id == user.id).first()
+
+    return {**user.__dict__, **doctor.__dict__}
