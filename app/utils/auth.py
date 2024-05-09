@@ -78,7 +78,7 @@ def set_access_cookies(token: str, response: Response):
         expires=datetime.now(timezone.utc)
         + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
         path="/",
-        domain="pasebukky.github.io",
+        domain="health.astrafort.tech",
         secure=True,
         httponly=True,
         samesite="none",
