@@ -31,6 +31,7 @@ class ShowDoctorProfile(BaseModel):
     first_name: str
     last_name: str
     email: str
+    phone: str
     role: str
     dob: Optional[date] = None
     gender: Optional[GenderEnum] = None
