@@ -84,6 +84,16 @@ def set_access_cookies(token: str, response: Response):
         samesite="none",
     )
 
+def delete_access_cookies(response: Response):
+    response.set_cookie(
+        key="access_token",
+        path="/",
+        domain="astrafort.tech",
+        secure=True,
+        httponly=True,
+        samesite="none",
+    )
+
 
 def get_current_user_from_cookie(request: Request, db: Session = Depends(load)) -> User:
     token = request.cookies.get("access_token")

@@ -9,8 +9,8 @@ from app.utils.auth import (
     authenticate_user,
     create_access_token,
     get_current_user,
-    get_current_user_from_cookie,
     set_access_cookies,
+    delete_access_cookies
 )
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from fastapi.security import OAuth2PasswordRequestForm
@@ -58,21 +58,17 @@ def login(
     return Token(access_token=access_token, token_type="bearer", role=user.role)
 
 @router.post("/logout")
-def logout(response: Response):
+def logout():
     """
     Logout endpoint.
 
     This endpoint clears the access cookies and returns a success message.
 
-    Parameters:
-    - response (Response): The FastAPI response object.
-
     Returns:
     - dict: A dictionary containing a success message.
-    """
+    """     
     # Clear access cookies
-    response.delete_cookie("access_token")
-    response.delete_cookie("access_token_expires")
+    delete_access_cookies()
 
     # Return a success message
     return {"detail": "Logged out successfully"}
