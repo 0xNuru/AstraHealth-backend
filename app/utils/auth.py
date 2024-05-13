@@ -126,7 +126,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     return user
 
 
-def authenticate_user(username: str, password: str, db: Session = Depends(load)) -> Union[User, bool]:
+def authenticate_user(username: str, password: str, db: Session = Depends(load)) -> User | bool:
     """
     Authenticate a user based on their username and password.
 
