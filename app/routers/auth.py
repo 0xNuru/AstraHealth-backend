@@ -26,6 +26,23 @@ def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(load),
 ) -> Token:
+    """
+    Login endpoint.
+
+    This endpoint authenticates a user using their username and password.
+    If the credentials are valid, it generates an access token and sets it as a cookie in the response.
+
+    Parameters:
+    - response (Response): The FastAPI response object.
+    - form_data (OAuth2PasswordRequestForm): The form data containing the username and password.
+    - db (Session): The database session.
+
+    Returns:
+    - Token: A Token object containing the access token and token type.
+
+    Raises:
+    - HTTPException: If the username or password is incorrect.
+    """
     user = authenticate_user(form_data.username.lower(), form_data.password, db)
     if not user:
         raise HTTPException(
@@ -39,6 +56,25 @@ def login(
     )
     set_access_cookies(access_token, response)
     return Token(access_token=access_token, token_type="bearer", role=user.role)
+
+@router.post("/logout")
+def logout(response: Response):
+    """
+    Logout endpoint.
+
+    This endpoint clears the access cookies and returns a success message.
+
+    Parameters:
+    - response (Response): The FastAPI response object.
+
+    Returns:
+    - dict: A dictionary containing a success message.
+    """
+    # Clear access cookies
+    response.delete_cookie("access_token")
+
+    # Return a success message
+    return {"detail": "Logged out successfully"}
 
 
 @router.get("/me/", response_model=ShowUser)
