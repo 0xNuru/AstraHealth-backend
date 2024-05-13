@@ -58,17 +58,20 @@ def login(
     return Token(access_token=access_token, token_type="bearer", role=user.role)
 
 @router.post("/logout")
-def logout():
+def logout(response: Response):
     """
     Logout endpoint.
 
     This endpoint clears the access cookies and returns a success message.
 
+    Parameters:
+    - response (Response): The FastAPI response object.
+
     Returns:
     - dict: A dictionary containing a success message.
     """     
     # Clear access cookies
-    delete_access_cookies()
+    delete_access_cookies(response)
 
     # Return a success message
     return {"detail": "Logged out successfully"}
