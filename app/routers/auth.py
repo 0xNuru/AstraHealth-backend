@@ -72,6 +72,7 @@ def logout(response: Response):
     """
     # Clear access cookies
     response.delete_cookie("access_token")
+    response.delete_cookie("access_token_expires")
 
     # Return a success message
     return {"detail": "Logged out successfully"}
