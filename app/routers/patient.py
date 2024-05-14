@@ -74,12 +74,6 @@ def update_profile(
 
             setattr(patient, field, value)
 
-    if request.SOS_phone is None and request.SOS_fullname not in ("", None):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=[{"msg": "SOS_phone is required if SOS_fullname is provided"}],
-        )
-
 
     if request.SOS_phone is not None:
         sos_contact =  db.query_eng(EmergencyContact).filter(EmergencyContact.patient_id == user.id).first()
