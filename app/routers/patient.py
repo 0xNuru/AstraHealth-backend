@@ -74,7 +74,7 @@ def update_profile(
 
             setattr(patient, field, value)
 
-    if request.SOS_phone is None and request.SOS_fullname is not None:
+    if request.SOS_phone is None and request.SOS_fullname is not "":
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=[{"msg": "SOS_phone is required if SOS_fullname is provided"}],
