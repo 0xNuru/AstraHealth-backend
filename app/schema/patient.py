@@ -7,7 +7,7 @@ and returning responses to the patient endpoints
 from datetime import date
 from typing import Optional
 
-from pydantic import BaseModel, constr
+from pydantic import BaseModel, constr, validator
 
 from app.models.patient import GenderEnum
 
@@ -21,6 +21,10 @@ class UpdatePatientProfile(BaseModel):
     image: Optional[str] = None
     SOS_fullname: Optional[str] = None
     SOS_phone: Optional[constr(min_length=11, max_length=14)] = None # type: ignore
+
+    @validator('SOS_phone', pre=True, always=True)
+    def empty_str_to_none(cls, v):
+        return None if v == "" else v
 
 
     class Config:
