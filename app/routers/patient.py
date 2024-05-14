@@ -107,10 +107,13 @@ def profile(db: Session = Depends(load), user: User = Depends(auth.get_current_u
         .filter(EmergencyContact.patient_id == user.id)
         .first()
     )
+    image_base64 = base64.b64encode(patient.image).decode('utf-8') if patient.image else None
+    patient_dict = {key: value for key, value in patient.__dict__.items() if key != 'image'}
 
     return {
         **user.__dict__,
-        **patient.__dict__,
+        **patient_dict,
+        "image": image_base64,
         "SOS_fullname": sos_contact.full_name if sos_contact else None,
         "SOS_phone": sos_contact.phone if sos_contact else None,
     }
