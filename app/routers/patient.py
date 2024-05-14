@@ -84,8 +84,10 @@ def update_profile(
     if request.SOS_phone is not None:
         sos_contact =  db.query_eng(EmergencyContact).filter(EmergencyContact.patient_id == user.id).first()
         if sos_contact:
-            sos_contact.full_name = request.SOS_fullname
-            sos_contact.phone = request.SOS_phone
+            if request.SOS_fullname:
+                sos_contact.full_name = request.SOS_fullname
+            if request.SOS_phone:
+                sos_contact.phone = request.SOS_phone
         else:    
             sos_contact = EmergencyContact(
                 full_name=request.SOS_fullname,
