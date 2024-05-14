@@ -73,16 +73,17 @@ def update_profile(
                     )
 
             setattr(patient, field, value)
-    
-    sos_contact = EmergencyContact(
-        full_name=request.SOS_fullname,
-        phone=request.SOS_phone,
-        patient_id=user.id,
-        role="SOS_contact",
-    )
+
+    if request.SOS_phone is not None:
+        sos_contact = EmergencyContact(
+            full_name=request.SOS_fullname,
+            phone=request.SOS_phone,
+            patient_id=user.id,
+            role="SOS_contact",
+        )
+        db.add(sos_contact)
 
     db.add(patient)
-    db.add(sos_contact)
     return patient
 
 
