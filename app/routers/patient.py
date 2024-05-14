@@ -62,7 +62,7 @@ def update_profile(
 ):
     patient = db.query_eng(Patient).filter(Patient.id == user.id).first()
     for field, value in request.dict(exclude_unset=True).items():
-        if value is not None and value is not "":
+        if value not in (None, ""):
             if field == "image":
                 # convert base64 image to binary
                 try:
@@ -75,14 +75,15 @@ def update_profile(
             setattr(patient, field, value)
 
 
-    if request.SOS_phone is not None:
-        sos_contact =  db.query_eng(EmergencyContact).filter(EmergencyContact.patient_id == user.id).first()
-        if sos_contact:
-            if request.SOS_fullname:
-                sos_contact.full_name = request.SOS_fullname
-            if request.SOS_phone:
-                sos_contact.phone = request.SOS_phone
-        else:    
+    sos_contact =  db.query_eng(EmergencyContact).filter(EmergencyContact.patient_id == user.id).first()
+    if sos_contact:
+        if request.SOS_fullname:
+            sos_contact.full_name = request.SOS_fullname
+        if request.SOS_phone:
+            sos_contact.phone = request.SOS_phone
+            db.add(sos_contact)
+    else:    
+        if request.SOS_fullname and request.SOS_phone:
             sos_contact = EmergencyContact(
                 full_name=request.SOS_fullname,
                 phone=request.SOS_phone,
@@ -90,6 +91,7 @@ def update_profile(
                 role="SOS_contact",
             )
             db.add(sos_contact)
+            
 
     db.add(patient)
     return patient
