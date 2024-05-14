@@ -7,7 +7,7 @@ and returning responses to the patient endpoints
 from datetime import date
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, constr
 
 from app.models.patient import GenderEnum
 
@@ -20,7 +20,8 @@ class UpdatePatientProfile(BaseModel):
     medical_history: Optional[str] = None
     image: Optional[str] = None
     SOS_fullname: Optional[str] = None
-    SOS_phone: Optional[str] = None
+    SOS_phone: Optional[constr(min_length=11, max_length=14)] = None # type: ignore
+
 
     class Config:
         orm_mode = True
