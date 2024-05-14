@@ -69,7 +69,7 @@ def update_profile(
                     value = base64.b64decode(value)
                 except binascii.Error:
                     raise HTTPException(
-                        status_code=400, detail=[{"Invalid base64-encoded string for image"}]
+                        status_code=400, detail=[{"msg": "Invalid base64-encoded string for image"}]
                     )
 
             setattr(patient, field, value)
