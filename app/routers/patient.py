@@ -64,6 +64,8 @@ def update_profile(
     for field, value in request.dict(exclude_unset=True).items():
         if value not in (None, ""):
             if field == "image":
+                if value.startswith('data:image') and ';base64,' in value:
+                    header, value = value.split(';base64,')
                 # convert base64 image to binary
                 try:
                     value = base64.b64decode(value)
