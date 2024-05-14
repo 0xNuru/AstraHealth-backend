@@ -62,7 +62,7 @@ def update_profile(
 ):
     patient = db.query_eng(Patient).filter(Patient.id == user.id).first()
     for field, value in request.dict(exclude_unset=True).items():
-        if value is not None:
+        if value is not None and value is not "":
             if field == "image":
                 # convert base64 image to binary
                 try:
