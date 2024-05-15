@@ -69,6 +69,7 @@ def update_profile(
                 # convert base64 image to binary
                 try:
                     value = base64.b64decode(value)
+                    setattr(patient, "image_header", header)
                 except binascii.Error:
                     raise HTTPException(
                         status_code=400, detail=[{"msg": "Invalid base64-encoded string for image"}]
@@ -109,12 +110,14 @@ def profile(db: Session = Depends(load), user: User = Depends(auth.get_current_u
         .first()
     )
     image_base64 = base64.b64encode(patient.image).decode('utf-8') if patient.image else None
+    if image_base64:
+        image_base64 = f"{patient.image_header}{image_base64}"
     patient_dict = {key: value for key, value in patient.__dict__.items() if key != 'image'}
 
     return {
         **user.__dict__,
         **patient_dict,
-        "image": f"data:image/png;base64,{image_base64}",
+        "image": image_base64,
         "SOS_fullname": sos_contact.full_name if sos_contact else None,
         "SOS_phone": sos_contact.phone if sos_contact else None,
     }

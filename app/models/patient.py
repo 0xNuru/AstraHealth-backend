@@ -26,5 +26,6 @@ class Patient(User):
     weight = Column(Float, nullable=True)
     medical_history = Column(String(270), nullable=True)
     image = Column(LargeBinary, nullable=True)
+    image_header = Column(String, nullable=True)
 
     emergency_contacts = relationship("EmergencyContact", back_populates="patient")
