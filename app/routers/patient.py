@@ -114,7 +114,7 @@ def profile(db: Session = Depends(load), user: User = Depends(auth.get_current_u
     return {
         **user.__dict__,
         **patient_dict,
-        "image": image_base64,
+        "image": f"data:image/png;base64,{image_base64}",
         "SOS_fullname": sos_contact.full_name if sos_contact else None,
         "SOS_phone": sos_contact.phone if sos_contact else None,
     }
