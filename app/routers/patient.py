@@ -53,7 +53,7 @@ def register(request: CreateUser, db: Session = Depends(load)):
 
 
 @router.patch(
-    "/update_profile", response_model=ShowPatientProfile, status_code=status.HTTP_200_OK
+    "/update_profile", status_code=status.HTTP_200_OK
 )
 def update_profile(
     request: UpdatePatientProfile,
@@ -96,8 +96,7 @@ def update_profile(
             
 
     db.add(patient)
-    return patient
-
+    return {"message": "Profile updated successfully!"}
 
 @router.get(
     "/profile", response_model=ShowPatientProfile, status_code=status.HTTP_200_OK
