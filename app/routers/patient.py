@@ -111,7 +111,7 @@ def profile(db: Session = Depends(load), user: User = Depends(auth.get_current_u
     )
     image_base64 = base64.b64encode(patient.image).decode('utf-8') if patient.image else None
     if image_base64:
-        image_base64 = f"{patient.image_header}{image_base64}"
+        image_base64 = f"{patient.image_header};base64,{image_base64}"
     patient_dict = {key: value for key, value in patient.__dict__.items() if key != 'image'}
 
     return {
