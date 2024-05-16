@@ -37,10 +37,10 @@ class ShowDoctorProfile(BaseModel):
     gender: Optional[GenderEnum] = None
     height: Optional[float] = None
     weight: Optional[float] = None
-    medical_liscence: Optional[str] = None
-    hospital_affiliation: Optional[str] = None
-    resume_link: Optional[str] = None
-    bio: Optional[str] = None
+    medicalLicense: Optional[str] = None
+    hospitalAffiliation: Optional[str] = None
+    resumeLink: Optional[str] = None
+    professionalBio: Optional[str] = None
     image: Optional[str] = None
 
     class Config:
