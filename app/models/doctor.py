@@ -20,6 +20,7 @@ class Doctor(User):
     __tablename__ = "doctors"
     id = Column(String, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
     image = Column(LargeBinary, nullable=True)
+    image_header = Column(String, nullable=True)
     dob = Column(Date, nullable=True)
     gender = Column(Enum(GenderEnum, name="gender_enum"))
     height = Column(Float, nullable=True)

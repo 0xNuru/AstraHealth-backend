@@ -11,7 +11,6 @@ from app.schema.user import ShowUser, CreateUser
 from app.utils import auth
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from typing import List
 
 router = APIRouter(prefix="/v1/patient", tags=["patient management"])
 

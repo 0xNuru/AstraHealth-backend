@@ -59,7 +59,7 @@ def all(db: Session = Depends(load)):
 
 
 @router.patch(
-    "/update_profile", response_model=ShowDoctorProfile, status_code=status.HTTP_200_OK
+    "/update_profile", status_code=status.HTTP_200_OK
 )
 def update_profile(
     request: UpdateDoctorProfile,
@@ -68,24 +68,23 @@ def update_profile(
 ):
     doctor = db.query_eng(Doctor).filter(Doctor.id == user.id).first()
     for field, value in request.dict(exclude_unset=True).items():
-        if value is not None:
+        if value not in (None, ""):
             if field == "image":
+                if value.startswith('data:image') and ';base64,' in value:
+                    header, value = value.split(';base64,')
                 # convert base64 image to binary
                 try:
                     value = base64.b64decode(value)
+                    setattr(doctor, "image_header", header)
                 except binascii.Error:
                     raise HTTPException(
-                        status_code=400,
-                        detail="Invalid base64-encoded string for image",
+                        status_code=400, detail=[{"msg": "Invalid base64-encoded string for image"}]
                     )
 
             setattr(doctor, field, value)
 
     db.add(doctor)
-    return {
-        **user.__dict__,
-        **doctor.__dict__,
-    }
+    return {"message": "Profile updated successfully!"}
 
 
 @router.get(
@@ -93,5 +92,13 @@ def update_profile(
 )
 def profile(db: Session = Depends(load), user: User = Depends(auth.get_current_user)):
     doctor = db.query_eng(Doctor).filter(Doctor.id == user.id).first()
+    image_base64 = base64.b64encode(doctor.image).decode('utf-8') if doctor.image else None
+    if image_base64:
+        image_base64 = f"{doctor.image_header};base64,{image_base64}"
+    doctor_dict = {key: value for key, value in doctor.__dict__.items() if key != 'image'}
 
-    return {**user.__dict__, **doctor.__dict__}
+    return {
+        **user.__dict__,
+        **doctor_dict,
+        "image": image_base64,
+    }

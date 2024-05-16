@@ -24,6 +24,17 @@ class UpdatePatientProfile(BaseModel):
 
     @validator('SOS_phone', pre=True, always=True)
     def empty_str_to_none(cls, v):
+        """
+        This method is a validator for the 'SOS_phone' field in the UpdatePatientProfile model.
+        It converts empty strings to None before assigning the value to the field.
+
+        Parameters:
+        cls (class): The class (in this case, UpdatePatientProfile) to which the validator is attached.
+        v (str): The value to be validated.
+
+        Returns:
+        None or str: Returns None if the input value is an empty string, otherwise returns the input value.
+        """
         return None if v == "" else v
 
 
