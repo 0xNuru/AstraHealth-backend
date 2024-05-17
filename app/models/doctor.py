@@ -3,7 +3,6 @@
 
 import enum
 from sqlalchemy import Column, Date, Enum, Float, ForeignKey, LargeBinary, String
-from sqlalchemy.orm import relationship
 
 
 from app.models.user import User
@@ -29,3 +28,4 @@ class Doctor(User):
     resumeLink = Column(String(270), nullable=True)
     hospitalAffiliation = Column(String(270), nullable=True)
     professionalBio = Column(String(220), nullable=True)
+    calendar_url = Column(String, nullable=True)
