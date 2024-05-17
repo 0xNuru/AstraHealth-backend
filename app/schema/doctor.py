@@ -22,7 +22,7 @@ class UpdateDoctorProfile(BaseModel):
     resumeLink: Optional[str] = None
     professionalBio: Optional[str] = None
     image: Optional[str] = None
-    calendar_url: Optional[str] = None
+    calendarLink: Optional[str] = None
 
     class Config:
         orm_mode = True
@@ -43,7 +43,7 @@ class ShowDoctorProfile(BaseModel):
     resumeLink: Optional[str] = None
     professionalBio: Optional[str] = None
     image: Optional[str] = None
-    calendar_url: Optional[str] = None
+    calendarLink: Optional[str] = None
 
     class Config:
         orm_mode = True
