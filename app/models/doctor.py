@@ -28,4 +28,4 @@ class Doctor(User):
     resumeLink = Column(String(270), nullable=True)
     hospitalAffiliation = Column(String(270), nullable=True)
     professionalBio = Column(String(220), nullable=True)
-    calendarLink = Column(String, nullable=True)
+    calendarLink = Column(String(270), nullable=True)
