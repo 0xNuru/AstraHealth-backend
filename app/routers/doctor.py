@@ -4,9 +4,8 @@ import base64
 import binascii
 from app.engine.load import load
 from app.models.doctor import Doctor
-from app.models.emergency_contact import EmergencyContact
 from app.models.user import User
-from app.schema.doctor import UpdateDoctorProfile, ShowDoctorProfile
+from app.schema.doctor import UpdateDoctorProfile, ShowDoctorProfile, ShowDoctorSchedule
 from app.schema.user import ShowUser, CreateUser
 from app.utils import auth
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -89,6 +88,22 @@ def update_profile(
 
 @router.get(
     "/profile", response_model=ShowDoctorProfile, status_code=status.HTTP_200_OK
+)
+def profile(db: Session = Depends(load), user: User = Depends(auth.get_current_user)):
+    doctor = db.query_eng(Doctor).filter(Doctor.id == user.id).first()
+    image_base64 = base64.b64encode(doctor.image).decode('utf-8') if doctor.image else None
+    if image_base64:
+        image_base64 = f"{doctor.image_header};base64,{image_base64}"
+    doctor_dict = {key: value for key, value in doctor.__dict__.items() if key != 'image'}
+
+    return {
+        **user.__dict__,
+        **doctor_dict,
+        "image": image_base64,
+    }
+
+@router.get(
+    "/schedule", response_model=ShowDoctorSchedule, status_code=status.HTTP_200_OK
 )
 def profile(db: Session = Depends(load), user: User = Depends(auth.get_current_user)):
     doctor = db.query_eng(Doctor).filter(Doctor.id == user.id).first()

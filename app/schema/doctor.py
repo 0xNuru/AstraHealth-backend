@@ -47,3 +47,12 @@ class ShowDoctorProfile(BaseModel):
 
     class Config:
         orm_mode = True
+
+class ShowDoctorSchedule(BaseModel):
+    first_name: str
+    last_name: str
+    image: Optional[str] = None
+    calendarLink: Optional[str] = None
+
+    class Config:
+        orm_mode = True
