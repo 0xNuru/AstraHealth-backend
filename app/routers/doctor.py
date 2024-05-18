@@ -51,12 +51,6 @@ def register(request: CreateUser, db: Session = Depends(load)):
     return new_doctor
 
 
-@router.get("/all", response_model=List[ShowDoctorCard], status_code=status.HTTP_200_OK)
-def all(db: Session = Depends(load)):
-    doctors = db.query_eng(Doctor).all()
-    return doctors
-
-
 @router.patch(
     "/update_profile", status_code=status.HTTP_200_OK
 )
@@ -101,6 +95,15 @@ def profile(db: Session = Depends(load), user: User = Depends(auth.get_current_u
         **doctor_dict,
         "image": image_base64,
     }
+
+@router.get("/all", response_model=List[ShowDoctorCard], status_code=status.HTTP_200_OK)
+def all(db: Session = Depends(load)):
+    doctors = db.query_eng(Doctor).all()
+    for doctor in doctors:
+        doctor.image = base64.b64encode(doctor.image).decode('utf-8') if doctor.image else None
+        if doctor.image:
+            doctor.image = f"{doctor.image_header};base64,{doctor.image}"
+    return doctors
 
 @router.get(
     "/schedule", response_model=ShowDoctorSchedule, status_code=status.HTTP_200_OK
