@@ -56,3 +56,14 @@ class ShowDoctorSchedule(BaseModel):
 
     class Config:
         orm_mode = True
+
+class ShowDoctorCard(BaseModel):
+    first_name: str
+    last_name: str
+    image: Optional[str] = None
+    calendarLink: Optional[str] = None
+    professionalBio: Optional[str] = None
+
+
+    class Config:
+        orm_mode = True

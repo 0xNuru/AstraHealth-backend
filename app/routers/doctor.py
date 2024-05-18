@@ -5,7 +5,7 @@ import binascii
 from app.engine.load import load
 from app.models.doctor import Doctor
 from app.models.user import User
-from app.schema.doctor import UpdateDoctorProfile, ShowDoctorProfile, ShowDoctorSchedule
+from app.schema.doctor import UpdateDoctorProfile, ShowDoctorProfile, ShowDoctorSchedule, ShowDoctorCard
 from app.schema.user import ShowUser, CreateUser
 from app.utils import auth
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -51,7 +51,7 @@ def register(request: CreateUser, db: Session = Depends(load)):
     return new_doctor
 
 
-@router.get("/all", response_model=List[ShowUser], status_code=status.HTTP_200_OK)
+@router.get("/all", response_model=List[ShowDoctorCard], status_code=status.HTTP_200_OK)
 def all(db: Session = Depends(load)):
     doctors = db.query_eng(Doctor).all()
     return doctors
