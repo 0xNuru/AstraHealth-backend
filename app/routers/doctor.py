@@ -106,17 +106,18 @@ def all(db: Session = Depends(load)):
     return doctors
 
 @router.get(
-    "/schedule", response_model=ShowDoctorSchedule, status_code=status.HTTP_200_OK
+    "/{doctor_id}", response_model=ShowDoctorSchedule, status_code=status.HTTP_200_OK
 )
-def profile(db: Session = Depends(load), user: User = Depends(auth.get_current_user)):
-    doctor = db.query_eng(Doctor).filter(Doctor.id == user.id).first()
+def schedule(doctor_id, db: Session = Depends(load), user: User = Depends(auth.get_current_user)):
+    doctor = db.query_eng(Doctor).filter(Doctor.id == doctor_id).first()
+    doctor_details = db.query_eng(User).filter(User.email == doctor.email).first()
     image_base64 = base64.b64encode(doctor.image).decode('utf-8') if doctor.image else None
     if image_base64:
         image_base64 = f"{doctor.image_header};base64,{image_base64}"
     doctor_dict = {key: value for key, value in doctor.__dict__.items() if key != 'image'}
 
     return {
-        **user.__dict__,
+        **doctor_details.__dict__,
         **doctor_dict,
         "image": image_base64,
     }
