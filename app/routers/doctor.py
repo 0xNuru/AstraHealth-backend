@@ -73,6 +73,10 @@ def update_profile(
                     raise HTTPException(
                         status_code=400, detail=[{"msg": "Invalid base64-encoded string for image"}]
                     )
+            if field == "calendarLink":
+                print('yes')
+                if value.startswith('https://'):
+                    protocol, value = value.split('https://cal.com/')
 
             setattr(doctor, field, value)
 
