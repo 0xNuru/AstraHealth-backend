@@ -61,6 +61,7 @@ class ShowDoctorSchedule(BaseModel):
 class ShowDoctorCard(BaseModel):
     first_name: str
     last_name: str
+    id: str
     image: Optional[str] = None
     calendarLink: Optional[str] = None
     professionalBio: Optional[str] = None
