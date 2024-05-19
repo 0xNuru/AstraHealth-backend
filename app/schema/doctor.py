@@ -51,8 +51,9 @@ class ShowDoctorProfile(BaseModel):
 class ShowDoctorSchedule(BaseModel):
     first_name: str
     last_name: str
-    image: Optional[str] = None
+    id: str
     calendarLink: Optional[str] = None
+    image: Optional[str] = None
 
     class Config:
         orm_mode = True
