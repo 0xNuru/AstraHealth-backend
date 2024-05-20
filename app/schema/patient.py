@@ -36,6 +36,12 @@ class UpdatePatientProfile(BaseModel):
         None or str: Returns None if the input value is an empty string, otherwise returns the input value.
         """
         return None if v == "" else v
+    
+    @validator('gender', pre=True)
+    def validate_gender(cls, value):
+        if isinstance(value, str):
+            value = value.capitalize() 
+        return value
 
 
     class Config:

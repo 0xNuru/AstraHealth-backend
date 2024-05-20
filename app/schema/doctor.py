@@ -7,7 +7,7 @@ and returning responses to the patient endpoints
 from datetime import date
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 
 from app.models.doctor import GenderEnum
 
@@ -23,6 +23,12 @@ class UpdateDoctorProfile(BaseModel):
     professionalBio: Optional[str] = None
     image: Optional[str] = None
     calendarLink: Optional[str] = None
+
+    @validator('gender', pre=True)
+    def validate_gender(cls, value):
+        if isinstance(value, str):
+            value = value.capitalize() 
+        return value
 
     class Config:
         orm_mode = True
