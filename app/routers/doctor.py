@@ -77,6 +77,8 @@ def update_profile(
                 print('yes')
                 if value.startswith('https://'):
                     protocol, value = value.split('https://cal.com/')
+            if field == "gender":
+                value = value.capitalize()
 
             setattr(doctor, field, value)
 
